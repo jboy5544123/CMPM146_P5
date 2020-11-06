@@ -56,6 +56,22 @@ def make_effector(rule):
         # This code is called by graph(state) and runs millions of times
         # Tip: Do something with rule['Produces'] and rule['Consumes'].
         next_state = None
+        next_state = state
+        for items_to_delete, num_items_to_delete in rule['Consumes'].items():
+            if(items_to_delete in next_state):
+                if(next_state[items_to_delete] > num_items_to_delete):
+                    next_state[items_to_delete] = next_state[items_to_delete]-num_items_to_delete
+                else:
+                    next_state.pop(items_to_delete)
+            else:
+                return False
+
+        for items_to_add, num_items_to_add in rule['Produces'].items():
+            if(items_to_add in next_state):
+                next_state[items_to_add] = next_state[items_to_add]+num_items_to_add
+            else:
+                next_state[items_to_add] = num_items_to_add
+
         return next_state
 
     return effect

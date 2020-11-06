@@ -37,10 +37,11 @@ def make_checker(rule):
     # Implement a function that returns a function to determine whether a state meets a
     # rule's requirements. This code runs once, when the rules are constructed before
     # the search is attempted.
-
     def check(state):
         # This code is called by graph(state) and runs millions of times.
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
+        if rule['Requires'] != None and rule['Consumes'] != None:
+            if (state['Requires'])
         return True
 
     return check
@@ -93,6 +94,7 @@ def search(graph, state, is_goal, limit, heuristic):
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     while time() - start_time < limit:
+        print(next(graph(state)))
         pass
 
     # Failed to find a path

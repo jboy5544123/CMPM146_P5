@@ -83,7 +83,14 @@ def make_goal_checker(goal):
 
     def is_goal(state):
         # This code is used in the search process and may be called millions of times.
-        return False
+        for items_needed, num_items_needed in goal:
+            if((items_needed in state) == False):
+                return False
+            else:
+                if(state[items_needed] < num_items_needed):
+                    return False
+                    
+        return True
 
     return is_goal
 

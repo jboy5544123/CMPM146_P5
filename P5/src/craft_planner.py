@@ -40,8 +40,12 @@ def make_checker(rule):
     def check(state):
         # This code is called by graph(state) and runs millions of times.
         # Tip: Do something with rule['Consumes'] and rule['Requires'].
-        if rule['Requires'] != None and rule['Consumes'] != None:
-            if (state['Requires'])
+        if 'Requires' in rule:
+            if any(x not in state for x in rule['Requires'].keys()):
+                return False
+            elif 'Consumes' in rule:
+                if any(x not in state or state[x] < rule['Consumes'][x] for x in rule['Consumes']):
+                    return False
         return True
 
     return check
@@ -110,7 +114,7 @@ def search(graph, state, is_goal, limit, heuristic):
     # representing the path. Each element (tuple) of the list represents a state
     # in the path and the action that took you to this state
     while time() - start_time < limit:
-        print(next(graph(state)))
+        next(graph(state))
         pass
 
     # Failed to find a path

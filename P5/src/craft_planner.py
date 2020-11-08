@@ -109,9 +109,18 @@ def heuristic(state, time, goal):
         return inf
     elif state['stone_axe'] > 1 or state['wooden_axe'] > 1 or state['iron_axe'] > 1:
         return inf
-    elif state['stick'] > 4 or state['plank'] > 4 or state['wood'] > 1 or state['cobble'] > 8:
+    #never make a second axe
+    elif (state['stone_axe'] > 1 and state['wooden_axe'] > 1) or (state['stone_axe'] > 1 and state['iron_axe'] > 1) or (state['wooden_axe'] > 1 and state['iron_axe'] > 1):
+        return inf
+    #never have more coal than ore
+    elif state['coal'] > state['ore']:
+        return inf
+    #if we have a furnace then dont make more than 3 cobble
+    elif(state['cobble'] > 3 and state['furnace'] >= 1):
+        return inf
+    elif state['stick'] > 4 or state['plank'] > 4 or state['wood'] > 1:
         return 1000
-    elif state['coal'] > 9 or state['ore'] > 9:
+    elif state['ore'] > 6 and state['furnace'] >= 1:
         return 1000
     return time
 
@@ -182,7 +191,7 @@ if __name__ == '__main__':
     state.update(Crafting['Initial'])
 
     # Search for a solution
-    resulting_plan, cost = search(graph, state, is_goal, 5, heuristic, goal)
+    resulting_plan, cost = search(graph, state, is_goal, 30, heuristic, goal)
 
     if resulting_plan:
         # Print resulting plan

@@ -89,6 +89,7 @@ def make_goal_checker(goal):
     return is_goal
 
 
+
 def graph(state):
     # Iterates through all recipes/rules, checking which are valid in the given state.
     # If a rule is valid, it returns the rule's name, the resulting state after application
@@ -105,23 +106,30 @@ def heuristic(state, time, goal):
     #if we already have a tool dont remake the tool
     elif state['bench'] > 1 or state['furnace'] > 1 or state['cart'] > 1:
         return inf
+    #dont make more then one pickaxe
     elif state['wooden_pickaxe'] > 1 or state['stone_pickaxe'] > 1 or state['iron_pickaxe'] > 1:
         return inf
-    elif state['stone_axe'] > 1 or state['wooden_axe'] > 1 or state['iron_axe'] > 1:
-        return inf
-    #never make a second axe
-    elif (state['stone_axe'] > 1 and state['wooden_axe'] > 1) or (state['stone_axe'] > 1 and state['iron_axe'] > 1) or (state['wooden_axe'] > 1 and state['iron_axe'] > 1):
+    #dont make an axe unless it is the goal item or in the goal
+    elif state['stone_axe'] > 0 or state['wooden_axe'] > 0 or state['iron_axe'] > 0:
         return inf
     #never have more coal than ore
     elif state['coal'] > state['ore']:
         return inf
-    #if we have a furnace then dont make more than 3 cobble
-    elif(state['cobble'] > 3 and state['furnace'] >= 1):
+    #if we have a furnace then dont get any more cobble
+    elif state['cobble'] > 0 and state['furnace'] >= 1:
+        return inf
+    elif 'rail' not in goal and state['wooden_pickaxe'] > 0 and state['plank'] > 2 and state['wood'] > 0:
+        return inf
+    elif ('iron_pickaxe' not in goal or 'rail' not in goal) and state['stone_pickaxe'] > 0 and state['stick'] > 4:
+        return inf
+    elif 'iron_pickaxe' in goal and state['ore'] + state['ingot'] > 3 and state['iron_pickaxe'] != 1:
+        return inf
+    elif 'cart' in goal and state['ore'] + state['ingot'] > 5 and state['cart'] != 1:
+        return inf
+    elif state['ore'] + state['ingot'] > 6:
         return inf
     elif state['stick'] > 4 or state['plank'] > 4 or state['wood'] > 1:
-        return 1000
-    elif state['ore'] > 6 and state['furnace'] >= 1:
-        return 1000
+        return 10
     return time
 
 def search(graph, state, is_goal, limit, heuristic, goal):
@@ -130,7 +138,7 @@ def search(graph, state, is_goal, limit, heuristic, goal):
     cost = 0
     actions = [(state.copy(), None)]
     if is_goal(next_state):
-        return actions, cost
+        return actions, cost, start_time
 
     # Implement your search here! Use your heuristic here!
     # When you find a path to the goal return a list of tuples [(state, action)]
@@ -147,8 +155,9 @@ def search(graph, state, is_goal, limit, heuristic, goal):
         test_tuple = (test[1].copy(), test[0])
         cost += test[2]
         actions.append(test_tuple)
+        print(next_state)
         if is_goal(next_state):
-            return actions, cost
+            return actions, cost, start_time
         pass
 
     # Failed to find a path
@@ -191,12 +200,12 @@ if __name__ == '__main__':
     state.update(Crafting['Initial'])
 
     # Search for a solution
-    resulting_plan, cost = search(graph, state, is_goal, 30, heuristic, goal)
+    resulting_plan, cost, time = search(graph, state, is_goal, 30, heuristic, goal)
 
     if resulting_plan:
         # Print resulting plan
         for state, action in resulting_plan:
             print(action)
             print('\t',state)
+        print(time)
         print(cost)
-        print(len(resulting_plan) - 1)

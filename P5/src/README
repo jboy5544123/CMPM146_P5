@@ -1,0 +1,12 @@
+Names: Saif Kausar, Josh Brown
+
+Our Search function calls the graph function which finds states that the
+current state can go to with the items it has in it.
+
+Then these states are run through our heuristic function which does a handful
+of checks and either returns 0 if it is the goal, the total time of the
+function we are trying to do or inf if it is violating a rule.
+
+For example if we already have a furnace and a stone pickaxe, there is
+no need for more cobble stone so we will not search through a state that
+increases our cobble stone.

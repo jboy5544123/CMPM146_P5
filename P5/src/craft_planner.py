@@ -136,6 +136,7 @@ def search(graph, state, is_goal, limit, heuristic, goal):
     start_time = time()
     next_state = state
     cost = 0
+    states = 0
     actions = [(state.copy(), None)]
     if is_goal(next_state):
         return actions, cost, start_time
@@ -147,6 +148,7 @@ def search(graph, state, is_goal, limit, heuristic, goal):
     while time() - start_time < limit:
         states_to_search = []
         for new_state in graph(next_state.copy()):
+            states+=1
             heu = heuristic(new_state[1], new_state[2], goal)
             heappush(states_to_search,(heu, (new_state[0], new_state[1].copy(), new_state[2])))
             checker_state = next_state.copy()
@@ -155,14 +157,12 @@ def search(graph, state, is_goal, limit, heuristic, goal):
         test_tuple = (test[1].copy(), test[0])
         cost += test[2]
         actions.append(test_tuple)
-        print(next_state)
         if is_goal(next_state):
             return actions, cost, start_time
         pass
 
     # Failed to find a path
     print("here")
-    print(next_state)
     print(time() - start_time, 'seconds.')
     print("Failed to find a path from", state, 'within time limit.')
     return None
